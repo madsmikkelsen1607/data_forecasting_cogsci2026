@@ -1,0 +1,7 @@
+Store,StoreType,Assortment,Promo2,CompetitionDistance,DistanceTier,Completeness,Reason
+274,b,b,1,3640.0,far,1.0,"adds coverage for DistanceTier=far, Promo2=1, StoreType=b"
+26,d,a,0,2300.0,near,1.0,"adds coverage for DistanceTier=near, Promo2=0, StoreType=d"
+37,c,a,0,4230.0,far,1.0,adds coverage for StoreType=c
+3,a,a,1,14130.0,far,1.0,adds coverage for StoreType=a
+335,b,a,1,90.0,near,1.0,new StoreType/Promo2/Distance combination b/1/near not yet represented
+85,b,a,0,1870.0,near,1.0,new StoreType/Promo2/Distance combination b/0/near not yet represented
