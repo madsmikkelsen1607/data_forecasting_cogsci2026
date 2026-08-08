@@ -44,21 +44,31 @@ class SelectionResult:
     justification: pd.DataFrame
 
 
+def filter_candidates(
+    store_df: pd.DataFrame,
+    train_df: pd.DataFrame,
+    completeness_threshold: float = COMPLETENESS_THRESHOLD,
+) -> pd.DataFrame:
+    """Stores with a usable (near-complete) sales history and a known
+    CompetitionDistance - the pool select_stores() picks 6 from."""
+    df = add_distance_tier(store_df)
+    completeness = completeness_by_store(train_df)
+    df = df.merge(
+        completeness.rename("Completeness"), left_on="Store", right_index=True
+    )
+    return df[
+        (df["Completeness"] >= completeness_threshold)
+        & df["CompetitionDistance"].notna()
+    ].copy()
+
+
 def select_stores(
     store_df: pd.DataFrame,
     train_df: pd.DataFrame,
     n: int = 6,
     completeness_threshold: float = COMPLETENESS_THRESHOLD,
 ) -> SelectionResult:
-    df = add_distance_tier(store_df)
-    completeness = completeness_by_store(train_df)
-    df = df.merge(
-        completeness.rename("Completeness"), left_on="Store", right_index=True
-    )
-    complete = df[
-        (df["Completeness"] >= completeness_threshold)
-        & df["CompetitionDistance"].notna()
-    ].copy()
+    complete = filter_candidates(store_df, train_df, completeness_threshold)
 
     complete["Cell"] = list(
         zip(complete["StoreType"], complete["Promo2"], complete["DistanceTier"])
