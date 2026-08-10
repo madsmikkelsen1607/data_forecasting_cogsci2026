@@ -75,3 +75,26 @@ def run_comparison(
         )
 
     return pd.DataFrame(rows)
+
+
+def test_predictions(
+    store_series: StoreSeries,
+    forecaster_factories: dict[str, Callable[[int], object]],
+    test_weeks: int = 6,
+    val_weeks: int = 6,
+) -> pd.DataFrame:
+    """Actual vs. predicted Sales on the test window, one column per method -
+    the raw numbers behind run_comparison's test-split metrics, kept here so
+    a concrete example forecast can be plotted rather than just scored."""
+    frame = store_series.frame
+    period = store_series.seasonal_period
+    train, val, test = time_split(frame, period, test_weeks, val_weeks)
+    train_val = pd.concat([train, val], ignore_index=True)
+
+    out = test[["Date", "Sales"]].copy().rename(columns={"Sales": "Actual"})
+    out.insert(0, "store", store_series.store_id)
+    out.insert(1, "test_day", range(len(test)))
+    for name, make in forecaster_factories.items():
+        model = make(period).fit(train_val)
+        out[name] = model.predict(len(test), test)
+    return out

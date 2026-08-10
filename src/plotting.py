@@ -5,6 +5,7 @@ skill (references/palette.md) - swap here if the palette ever changes.
 """
 
 import matplotlib.pyplot as plt
+import pandas as pd
 from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.ticker import FuncFormatter
 
@@ -83,3 +84,55 @@ def comma_axis(ax, which: str = "y") -> None:
         ax.yaxis.set_major_formatter(fmt)
     if which in ("x", "both"):
         ax.xaxis.set_major_formatter(fmt)
+
+
+def dataframe_to_image(
+    df: pd.DataFrame,
+    path,
+    col_labels: list | None = None,
+    title: str | None = None,
+    fontsize: int = 11,
+) -> None:
+    """Render a small, already-formatted DataFrame as a clean booktabs-style
+    table image - ready to paste straight into a document. Round/rename
+    columns and drop anything not paper-ready before calling this; it just
+    renders whatever strings it's given."""
+    set_paper_style()
+    labels = col_labels if col_labels is not None else [str(c) for c in df.columns]
+    n_rows, n_cols = df.shape
+
+    fig_width = max(5.0, 1.4 * n_cols)
+    fig_height = 0.42 * (n_rows + 1) + (0.35 if title else 0.1)
+    fig, ax = plt.subplots(figsize=(fig_width, fig_height))
+    ax.axis("off")
+    if title:
+        ax.set_title(title, fontsize=fontsize + 2, loc="left", pad=8, weight="bold")
+
+    table = ax.table(
+        cellText=df.astype(str).values,
+        colLabels=labels,
+        cellLoc="center",
+        loc="center",
+    )
+    table.auto_set_font_size(False)
+    table.set_fontsize(fontsize)
+    table.scale(1, 1.8)
+    table.auto_set_column_width(col=list(range(n_cols)))
+
+    last_row = n_rows  # header is row 0, data rows are 1..n_rows
+    for (row, _col), cell in table.get_celld().items():
+        cell.set_facecolor(SURFACE)
+        cell.set_edgecolor(INK_PRIMARY)
+        cell.visible_edges = ""
+        if row == 0:
+            cell.set_text_props(weight="bold", color=INK_PRIMARY)
+            cell.visible_edges = "TB"
+            cell.set_linewidth(1.3)
+        else:
+            cell.set_text_props(color=INK_PRIMARY)
+            if row == last_row:
+                cell.visible_edges = "B"
+                cell.set_linewidth(1.0)
+
+    fig.savefig(path, dpi=220, bbox_inches="tight", pad_inches=0.15, facecolor=SURFACE)
+    plt.close(fig)

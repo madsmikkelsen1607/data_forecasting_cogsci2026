@@ -1,9 +1,8 @@
 # Project: Data Science, Prediction & Forecasting — Exam Project
 
 ## Context
-Take-home exam for the course "Data Science, Prediction and Forecasting"
-(Cognitive Science Master's). Solo paper, 10-12 standard pages. Topic and
-method must be approved by the teacher.
+Exam for the course Data Science, Prediction and Forecasting. 
+Solo paper, 10-12 standard pages.
 
 Course grading emphasizes: describing/contrasting methods for time series,
 identifying and preparing relevant data, visualizing time series, presenting
